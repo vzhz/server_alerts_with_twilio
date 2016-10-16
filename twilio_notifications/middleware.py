@@ -11,6 +11,22 @@ def load_twilio_config():
 
     return (twilio_number, twilio_account_sid, twilio_auth_token)
 
+### Send text message with Twillio REST API (From, To, Body) ###
+class MessageClient(object):
+    def __init__(self):
+        (twilio_number, twilio_account_sid,
+         twilio_auth_token) = load_twilio_config()
+
+        self.twilio_number = twilio_number
+        self.twilio_client = Client(twilio_account_sid,
+                                              twilio_auth_token)
+
+    def send_message(self, body, to):
+        self.twilio_client.messages.create(body=body, to=to,
+                                           from_=self.twilio_number,
+                                           # media_url=['https://demo.twilio.com/owl.png'])
+                                           )
+
 ### Error handling with Django middleware. API calls from here ###
 class TwilioNotificationsMiddleware(object):
     def __init__(self):
