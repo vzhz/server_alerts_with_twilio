@@ -8,3 +8,20 @@ def load_twilio_config():
         raise MiddlewareNotUsed
 
     return (twilio_number, twilio_account_sid, twilio_auth_token)
+
+
+class TwilioNotificationsMiddleware(object):
+    def __init__(self):
+        self.administrators = load_admins_file()
+        self.client = MessageClient()
+
+    def process_exception(self, request, exception):
+        exception_message = str(exception)
+        message_to_send = MESSAGE % exception_message
+
+        for admin in self.administrators:
+            self.client.send_message(message_to_send, admin['phone_number'])
+
+        logger.info('Administrators notified')
+
+        return None
